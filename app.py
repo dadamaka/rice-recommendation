@@ -1,4 +1,4 @@
-from flask import Flask, json, jsonify, make_response, request, session
+from flask import Flask, jsonify, make_response, request, session
 from recommender import Recommender
 from uuid import uuid4
 
@@ -13,10 +13,12 @@ recommender = Recommender(
 def hello_world():
 	return 'Hello World!'
 
-@app.route('/restaurants/<user_id>', methods=["GET"])
-def api_restaurants(user_id):
+@app.route('/api/restaurants', methods=["POST"])
+def api_restaurants():
+	request_data = request.get_json(force=True)
 	top_items = recommender.recommend(
-      user_id=user_id)
+      user_id=request_data['user_ids'],
+      query=request_data['preferences']['categories'])
 	response = jsonify(items=top_items)
 	response.status_code = 200
 	return response
